@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/country.dart';
-import '../services/rest_service.dart';
+import '../repository/country_repository.dart';
 import '../widgets/country_card.dart';
 import 'country_detail_screen.dart';
 
@@ -13,7 +13,7 @@ class CountryListScreen extends StatefulWidget {
 
 class _CountryListScreenState extends State<CountryListScreen>
     with AutomaticKeepAliveClientMixin {
-  final RestService _service = RestService();
+  final CountryRepository _repository = CountryRepository();
   final TextEditingController _searchController = TextEditingController();
 
   late Future<List<Country>> _countriesFuture;
@@ -29,15 +29,15 @@ class _CountryListScreenState extends State<CountryListScreen>
   @override
   void initState() {
     super.initState();
-    _countriesFuture = _service.fetchAllCountries();
+    _countriesFuture = _repository.getAllCountries();
   }
 
   void _onSearch(String query) {
     setState(() {
       if (query.isEmpty) {
-        _countriesFuture = _service.fetchAllCountries();
+        _countriesFuture = _repository.getAllCountries();
       } else {
-        _countriesFuture = _service.searchByName(query);
+        _countriesFuture = _repository.searchByName(query);
       }
     });
   }
@@ -48,9 +48,9 @@ class _CountryListScreenState extends State<CountryListScreen>
       _selectedRegion = region;
       _searchController.clear();
       if (region == 'Todos') {
-        _countriesFuture = _service.fetchAllCountries();
+        _countriesFuture = _repository.getAllCountries();
       } else {
-        _countriesFuture = _service.fetchByRegion(region);
+        _countriesFuture = _repository.getByRegion(region);
       }
     });
   }
@@ -73,7 +73,8 @@ class _CountryListScreenState extends State<CountryListScreen>
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16),
                 ),
               ),
               const SizedBox(height: 8),
@@ -84,10 +85,12 @@ class _CountryListScreenState extends State<CountryListScreen>
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16),
                 ),
                 items: _regions
-                    .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                    .map((r) =>
+                    DropdownMenuItem(value: r, child: Text(r)))
                     .toList(),
                 onChanged: _onRegionChanged,
               ),
@@ -106,7 +109,8 @@ class _CountryListScreenState extends State<CountryListScreen>
               }
               final countries = snapshot.data!;
               if (countries.isEmpty) {
-                return const Center(child: Text('No se encontraron países.'));
+                return const Center(
+                    child: Text('No se encontraron países.'));
               }
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -117,8 +121,8 @@ class _CountryListScreenState extends State<CountryListScreen>
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            CountryDetailScreen(country: countries[index]),
+                        builder: (_) => CountryDetailScreen(
+                            country: countries[index]),
                       ),
                     ),
                   );
